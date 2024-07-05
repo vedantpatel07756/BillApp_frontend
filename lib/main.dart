@@ -89,6 +89,7 @@ class _HomeState extends State<Home> {
 
 
 
+
 // Bottom Navigation Bar 
   BottomNavigationBar navigationBar() {
     return BottomNavigationBar(
@@ -136,3 +137,9 @@ class _HomeState extends State<Home> {
   }
 }
 
+// git init
+// git add README.md
+// git commit -m "first commit"
+// git branch -M main
+// git remote add origin https://github.com/vedantpatel07756/BillApp_frontend.git
+// git push -u origin main
