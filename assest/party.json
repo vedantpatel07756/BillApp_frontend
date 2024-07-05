@@ -1,0 +1,24 @@
+{
+    "inputs": [
+      {
+        "name": "Value1",
+        "pay": 1000,
+        "type": "Supply"
+      },
+      {
+        "name": "Value2",
+        "pay": 2000,
+        "type": "Customer"
+      },
+      {
+        "name": "Value3",
+        "pay": 1500,
+        "type": "Supply"
+      },
+      {
+        "name": "Value4",
+        "pay": 2500,
+        "type": "Customer"
+      }
+    ]
+  }
