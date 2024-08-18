@@ -1,219 +1,3 @@
-// import 'package:flutter/material.dart';
-// // import 'package:flutter/services.dart' show rootBundle;
-// import 'dart:convert';
-// import 'package:billapp/module/partydata.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:billapp/components/create.dart';
-// class Parties extends StatefulWidget {
-//   @override
-//   _PartiesState createState() => _PartiesState();
-// }
-
-
-// class _PartiesState extends State<Parties> {
-//   List<String> myTag = ["To Pay", "To Collect"];
-//   String selectedTag = "To Pay"; // Initially selected tag
-
-
-// // Fetch Party Data 
-// Future<List<PartyData>> fetchPartyData() async {
-//   final response = await http.get(Uri.parse('http://10.0.2.2:5000/partydata'));
-
-//   if (response.statusCode == 200) {
-//     List jsonResponse = json.decode(response.body);
-//     return jsonResponse.map((data) => PartyData.fromJson(data)).toList();
-//   } else {
-//     throw Exception('Failed to load party data');
-//   }
-// }
-
-
-
-
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: FilterTag(),
-//       body: Container(
-//         margin: EdgeInsets.only(bottom: 20),
-//         child: Stack(
-//           children: [
-//               Positioned(
-//                 top: 500,
-//                 left: 125,
-//                 child: Center(child: Create_party()),
-                
-//               ),
-//               Positioned(
-//                 top: 20,
-//                 left: 20,
-//                 child: Column(
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   children: [
-//                     pData("Vedant","200","Supplier"),
-//                     pData("Devesh","400","Customer"),
-//                     pData("Mummy","200","Supplier"),
-//                   ],
-//                 )
-//                   )
-                 
-
-//           ],
-//         )
-
-   
-       
-//       ),
-//     );
-//   }
-
-
-
-
-
-
-//   // Parties Data 
-
-//   Container pData(String name,String balance,String type) {
-//     return Container(
-//                 width: 350,
-//                 margin: EdgeInsets.only(top: 20),
-//                 decoration: BoxDecoration(
-//                   color: Colors.white,
-//                   boxShadow:[
-//               BoxShadow(
-//                 color: Colors.black.withOpacity(0.5),
-//                 spreadRadius: 1,
-//                 blurRadius: 3,
-//                 offset: Offset(0, 3), // changes position of shadow
-//               ),
-//             ],
-                
-//                   borderRadius: BorderRadius.circular(10)
-//                 ),
-//                 child:Padding(
-//                   padding: const EdgeInsets.all(10.0),
-//                   child: Column(
-//                     children: [
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         children: [
-//                           Text(name,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600)),
-//                           Text("₹ ${balance}",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600)),
-                      
-//                         ],
-//                       ),
-
-//                       Row(
-                        
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         children: [
-//                           Text(type,style: TextStyle(fontSize: 17,fontWeight: FontWeight.w500,color: Colors.grey)),
-//                           Text(" ",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600)),
-                      
-//                         ],
-//                       ),
-
-
-//                     ],
-//                   ),
-//                 ),
-//                 );
-//   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Create Party Button
-
-//   ElevatedButton Create_party() {
-//     return ElevatedButton(
-//         onPressed: () {
-//           Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Create()));
-//           print('Button Pressed');
-//         },
-//         child: Text(
-//           'Create Party +',
-//           style: TextStyle(color: Colors.white),
-//         ),
-//         style: ElevatedButton.styleFrom(
-//           backgroundColor: Colors.blue, // Background color
-//         ));
-//   }
-
-// // Filter Method
-
-//   AppBar FilterTag() {
-//     return AppBar(
-//       toolbarHeight: 70,
-//       backgroundColor: Colors.transparent,
-//       title: SingleChildScrollView(
-//         scrollDirection: Axis.horizontal,
-//         child: Row(
-//           children: [
-//             Text("Filter By: "),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//               children: myTag
-//                   .map((tag) => GestureDetector(
-//                         onTap: () {
-//                           setState(() {
-//                             if (selectedTag == tag) {
-//                               // selectedTag=null;
-//                             }
-//                             selectedTag = tag;
-//                           });
-//                         },
-//                         child: Container(
-//                           margin: const EdgeInsets.only(top: 10, left: 20),
-//                           decoration: BoxDecoration(
-//                             border: Border.all(),
-//                             color: selectedTag == tag
-//                                 ? (tag == "To Pay" ? Colors.red : Colors.green)
-//                                 : Color.fromARGB(23, 158, 158, 158),
-//                             borderRadius: BorderRadius.circular(20),
-//                           ),
-//                           child: Padding(
-//                             padding: EdgeInsets.all(10.0),
-//                             child: Text(
-//                               tag,
-//                               style: TextStyle(
-//                                 fontSize: 15,
-//                                 color: selectedTag == tag
-//                                     ? Colors.white
-//                                     : Colors.black,
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-//                       ))
-//                   .toList(),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
-
-
-
 
 import 'package:billapp/components/Party/partyProfile.dart';
 import 'package:billapp/config.dart';
@@ -383,7 +167,7 @@ class _PartiesState extends State<Parties> {
                           decoration: BoxDecoration(
                             border: Border.all(),
                             color: selectedTag == tag
-                                ? (tag == "To Pay" ? Colors.red :(tag == "To Collect"? Colors.green:Colors.blue[300]))
+                                ? (tag == "Supplier" ? Colors.red :(tag == "Customer"? Colors.green:Colors.blue[300]))
                                 : Color.fromARGB(23, 158, 158, 158),
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -455,7 +239,12 @@ class _PartiesState extends State<Parties> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-                  Text("₹ $balance", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                  Row(
+                    children: [
+                      Icon((type=="Supplier")?Icons.arrow_upward:Icons.arrow_downward,color: (type=="Supplier")?Colors.red:Colors.green,),
+                      Text("₹ $balance", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
                 ],
               ),
               Row(

@@ -2,11 +2,13 @@
 import 'package:billapp/components/Dashboard/CreateBill.dart';
 import 'package:billapp/components/Dashboard/billinvoice.dart';
 import 'package:billapp/components/Dashboard/stockValue.dart';
+import 'package:billapp/components/Party/parties.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../module/partydata.dart';
 import 'package:billapp/config.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -31,6 +33,13 @@ Future<List<Map<String, dynamic>>> fetchInvoices() async {
   }
 }
 
+ Future<void> _requestPermission() async {
+  var status = await Permission.storage.status;
+  if (!status.isGranted) {
+    await Permission.storage.request();
+  }
+}
+
 
 class _DashboardState extends State<Dashboard> {
   bool isTransactionData = true;
@@ -50,7 +59,7 @@ class _DashboardState extends State<Dashboard> {
   Future<void> fetchAndProcessPartyData() async {
     // String baseurl = 'http://192.168.43.21:5000';
       String baseurl = Config.baseURL;
-
+        await _requestPermission();
     try {
       print("Fetching data...");
       final response = await http.get(Uri.parse('$baseurl/partydata'));
@@ -63,7 +72,7 @@ class _DashboardState extends State<Dashboard> {
         int toPayTemp = 0;
 
         for (var partyData in partyDataList) {
-          print("Check........${partyData.type}");
+          // print("Check........${partyData.type}");
           if (partyData.type == 'Customer') {
             toCollectTemp += partyData.balance;
           } else if (partyData.type == 'Supplier') {
@@ -72,7 +81,7 @@ class _DashboardState extends State<Dashboard> {
         }
 
         setState(() {
-          print("toCollect = $toCollectTemp, toPay = $toPayTemp");
+          // print("toCollect = $toCollectTemp, toPay = $toPayTemp");
           toCollect = toCollectTemp;
           toPay = toPayTemp;
         });
@@ -140,7 +149,7 @@ class _DashboardState extends State<Dashboard> {
             ),
             ElevatedButton(
               style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.purple),
+                backgroundColor: MaterialStatePropertyAll(Colors.blue),
               ),
               onPressed: () {
                 Navigator.of(context).push(
@@ -189,165 +198,367 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Container TransactionHeading() {
-    return Container(
-      decoration: BoxDecoration(
-        border: BorderDirectional(
-          bottom: BorderSide(width: 0.5),
-          top: BorderSide(),
+  // Container TransactionHeading() {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       border: BorderDirectional(
+  //         bottom: BorderSide(width: 0.5),
+  //         top: BorderSide(),
+  //       ),
+  //       color: Colors.white,
+  //     ),
+  //     padding: EdgeInsets.all(15),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           "Transactions",
+  //           style: TextStyle(
+  //             color: Colors.blue,
+  //             fontSize: 20,
+  //             fontWeight: FontWeight.w600,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+
+Container TransactionHeading() {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 10,
+          offset: Offset(0, 5),
         ),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.all(15),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Transactions",
-            style: TextStyle(
-              color: Colors.purple,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
+      ],
+      border: Border.all(color: Colors.grey.shade300),
+    ),
+    padding: EdgeInsets.all(15),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Transactions",
+          style: TextStyle(
+            color: Colors.blue,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
+  // Container combinevalue(int toCollect, int toPay) {
+  //   return Container(
+  //     width: 500,
+  //     decoration: BoxDecoration(color: Colors.white),
+  //     padding: EdgeInsets.all(20),
+  //     child: Column(
+  //       children: [
+  //         SingleChildScrollView(
+  //           scrollDirection: Axis.horizontal,
+  //           child: Row(
+  //             children: [
+  //               //------------------------------------- To Collect
+  //               Container(
+  //                 width: 140,
+  //                 padding: EdgeInsets.all(20),
+  //                 decoration: BoxDecoration(
+  //                   color: Color.fromARGB(113, 42, 242, 85),
+  //                   border: Border.all(color: Colors.green),
+  //                   borderRadius: BorderRadius.circular(10),
+  //                 ),
+  //                 child: Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     Text(
+  //                       "₹ $toCollect",
+  //                       style: TextStyle(
+  //                         fontSize: 20,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                     ),
+  //                     Text(
+  //                       "To Collect",
+  //                       style: TextStyle(
+  //                         fontSize: 15,
+  //                         fontWeight: FontWeight.w600,
+  //                         color: Colors.green,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //               //------------------------------------- To Pay
+  //               Container(
+  //                 padding: EdgeInsets.all(20),
+  //                 width: 140,
+  //                 margin: EdgeInsets.only(left: 30),
+  //                 decoration: BoxDecoration(
+  //                   color: Color.fromARGB(112, 242, 42, 42),
+  //                   border: Border.all(color: Colors.red),
+  //                   borderRadius: BorderRadius.circular(10),
+  //                 ),
+  //                 child: Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     Text(
+  //                       "₹ $toPay",
+  //                       style: TextStyle(
+  //                         fontSize: 20,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                     ),
+  //                     Text(
+  //                       "To Pay",
+  //                       style: TextStyle(
+  //                         fontSize: 15,
+  //                         fontWeight: FontWeight.w600,
+  //                         color: Colors.red,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         SingleChildScrollView(
+  //           scrollDirection: Axis.horizontal,
+  //           child: Row(
+  //             children: [
+  //               //------------------------------------- Stock Value
+  //               GestureDetector(
+  //                 onTap:(){
+  //                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StockValue()));
+  //                 },
+  //                 child: Container(
+  //                   padding: EdgeInsets.all(20),
+  //                   width: 150,
+  //                   margin: EdgeInsets.only(top: 20),
+  //                   decoration: BoxDecoration(
+  //                     // color: Color.fromARGB(112, 242, 42, 42),
+  //                     border: Border.all(color: Colors.grey),
+  //                     borderRadius: BorderRadius.circular(10),
+  //                   ),
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         "Stock Value",
+  //                         style: TextStyle(
+  //                           fontSize: 20,
+  //                           fontWeight: FontWeight.w600,
+  //                         ),
+  //                       ),
+  //                       Text(
+  //                         "Value of Item >",
+  //                         style: TextStyle(
+  //                           fontSize: 15,
+  //                           fontWeight: FontWeight.w400,
+  //                           color: Colors.grey,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //               //------------------------------------- Stock Value
+  //               GestureDetector(
+  //                 onTap: (){
+  //                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Parties()));
+  //                 },
+  //                 child: Container(
+  //                   padding: EdgeInsets.all(20),
+  //                   width: 150,
+  //                   margin: EdgeInsets.only(left: 20, top: 20),
+  //                   decoration: BoxDecoration(
+  //                     // color: Color.fromARGB(112, 242, 42, 42),
+  //                     border: Border.all(color: Colors.grey),
+  //                     borderRadius: BorderRadius.circular(10),
+  //                   ),
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         "Filter Data",
+  //                         style: TextStyle(
+  //                           fontSize: 20,
+  //                           fontWeight: FontWeight.w600,
+  //                         ),
+  //                       ),
+  //                       Text(
+  //                         "See Data >",
+  //                         style: TextStyle(
+  //                           fontSize: 15,
+  //                           fontWeight: FontWeight.w400,
+  //                           color: Colors.grey,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
 
   Container combinevalue(int toCollect, int toPay) {
-    return Container(
-      width: 500,
-      decoration: BoxDecoration(color: Colors.white),
-      padding: EdgeInsets.all(20),
-      child: Column(
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                //------------------------------------- To Collect
-                Container(
-                  width: 140,
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(113, 42, 242, 85),
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(10),
+  return Container(
+    width: 500,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 10,
+          offset: Offset(0, 5),
+        ),
+      ],
+    ),
+    padding: EdgeInsets.all(20),
+    child: Column(
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              //------------------------------------- To Collect
+              Container(
+                width: 140,
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF2AF255), Color(0xFF1ABC9C)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "₹ $toCollect",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        "To Collect",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
+                  border: Border.all(color: Colors.green),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
                 ),
-                //------------------------------------- To Pay
-                Container(
-                  padding: EdgeInsets.all(20),
-                  width: 140,
-                  margin: EdgeInsets.only(left: 30),
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(112, 242, 42, 42),
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "₹ $toPay",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "₹ $toCollect",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      Text(
-                        "To Pay",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red,
-                        ),
+                    ),
+                    Text(
+                      "To Collect",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              //------------------------------------- To Pay
+              Container(
+                padding: EdgeInsets.all(20),
+                width: 140,
+                margin: EdgeInsets.only(left: 30),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFF23D3D), Color(0xFFC0392B)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border.all(color: Colors.red),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.red.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "₹ $toPay",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      "To Pay",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                //------------------------------------- Stock Value
-                GestureDetector(
-                  onTap:(){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>StockValue()));
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(20),
-                    width: 150,
-                    margin: EdgeInsets.only(top: 20),
-                    decoration: BoxDecoration(
-                      // color: Color.fromARGB(112, 242, 42, 42),
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Stock Value",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          "Value of Item >",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                //------------------------------------- Stock Value
-                Container(
+        ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              //------------------------------------- Stock Value
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => StockValue()));
+                },
+                child: Container(
                   padding: EdgeInsets.all(20),
                   width: 150,
-                  margin: EdgeInsets.only(left: 20, top: 20),
+                  margin: EdgeInsets.only(top: 20),
                   decoration: BoxDecoration(
-                    // color: Color.fromARGB(112, 242, 42, 42),
-                    border: Border.all(color: Colors.grey),
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Total Value",
+                        "Stock Value",
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
                       ),
                       Text(
@@ -361,12 +572,57 @@ class _DashboardState extends State<Dashboard> {
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              //------------------------------------- Filter Data
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => Parties()));
+                },
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  width: 150,
+                  margin: EdgeInsets.only(left: 20, top: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Filter Data",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Text(
+                        "See Data >",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }
 

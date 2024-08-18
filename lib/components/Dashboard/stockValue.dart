@@ -88,7 +88,7 @@ class _StockValueState extends State<StockValue> {
               child: Container(
                 // margin: EdgeInsets.all(10),
                 child: Column(
-                   children: items.map((item) => itemsLists(item.id,item.name,item.quantity,item.salesPrice,item.purchasePrice)).toList(),
+                   children: items.map((item) => itemsLists(item.id,item.name,item.quantity,item.salesPrice,item.purchasePrice,item.unit)).toList(),
                   
                 ),
               ),
@@ -107,7 +107,7 @@ class _StockValueState extends State<StockValue> {
   }
 
 
-GestureDetector itemsLists(int id, String name,String quantity,String sales_price,String Purpase_price) {
+GestureDetector itemsLists(int id, String name,String quantity,String sales_price,String Purpase_price,String unit) {
     // print(name);
     int value = int.tryParse(sales_price)!* int.tryParse(quantity)!;
     
@@ -118,7 +118,9 @@ GestureDetector itemsLists(int id, String name,String quantity,String sales_pric
                                                                   name:name,
                                                                   quantity:quantity,
                                                                   sales_price:sales_price,
-                                                                  purchase_price:Purpase_price))).then((value){
+                                                                  purchase_price:Purpase_price,
+                                                                  unit:unit,
+                                                                  ))).then((value){
                                                                     if(value){
                                                                       Navigator.of(context).pop(true);
                                                                     }

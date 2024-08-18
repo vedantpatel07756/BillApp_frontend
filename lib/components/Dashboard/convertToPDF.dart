@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart'; 
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -26,6 +27,11 @@ class Invoice2 {
   final int partyId;
   final String status;
   final String totalAmount;
+  final String Bussinessname;
+  final  String BussinessPhone;
+
+
+
 
   Invoice2({
     required this.id,
@@ -34,6 +40,10 @@ class Invoice2 {
     required this.partyId,
     required this.status,
     required this.totalAmount,
+    required this.Bussinessname,
+    required this.BussinessPhone,
+
+    
   });
 
   factory Invoice2.fromJson(Map<String, dynamic> json) {
@@ -47,6 +57,9 @@ class Invoice2 {
       partyId: json['party_id'],
       status: json['status'],
       totalAmount: json['total_amount'],
+      Bussinessname:json['bussinessName'],
+      BussinessPhone:json['bussinessPhone'],
+
     );
   }
 }
@@ -57,6 +70,9 @@ class Item {
   final String quantity;
   final String totalItemValue;
   final String unitPrice;
+  final String discount_type;
+  final String discount_value;
+  final String unit;
 
   Item({
     required this.id,
@@ -64,6 +80,9 @@ class Item {
     required this.quantity,
     required this.totalItemValue,
     required this.unitPrice,
+    required this.discount_type,
+    required this.discount_value,
+    required this.unit
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
@@ -73,6 +92,10 @@ class Item {
       quantity: json['quantity'],
       totalItemValue: json['total_item_value'],
       unitPrice: json['unit_price'],
+      discount_type:json['discount_type'],
+      discount_value:json['discountAmount'],
+      unit:json['unit'],
+
     );
   }
 }
@@ -104,7 +127,19 @@ class _ConverttopdfState extends State<Converttopdf> {
 
   late Future<dynamic> futureInvoice;
 
+// Try 3 
+String bName="Shree Samarth Trading";
+String bPhone="9284590263";
+String paymentmode="Cash";
 
+String paymentCash="0";
+String paymentOnline="0";
+
+String Paymentcash="0";
+String PaymentOnline="0";
+String balance="0";
+String totalAmount="0";
+   
   // Try 3 
 
   Future<void> _requestPermission() async {
@@ -114,17 +149,29 @@ class _ConverttopdfState extends State<Converttopdf> {
   }
 }
 
+// Example to load image bytes synchronously
+Future<Uint8List> loadImageBytes(String imagePath) async {
+  final ByteData data = await rootBundle.load(imagePath);
+  return data.buffer.asUint8List();
+}
+
+
 Future<void> _downloadPDF2( Invoice2? invoice) async {
+  //  balance = (int.tryParse(totalAmount ?? '0')!)-(int.tryParse(paymentCash ?? '0')! + int.tryParse(PaymentOnline ?? '0')!);
 
-
+// Load image bytes synchronously
+    final Uint8List imageBytes = await loadImageBytes('assest/app_icon.png');
 
   final pdf = pw.Document();
-  int totalAmount = 0;
+  // int totalAmount = 0;
   DateTime now = DateTime.now();
   DateTime dueDate = now.add(Duration(days: 7));
 
   String currentDate = DateFormat('dd-MM-yyyy').format(now);
   String formattedDueDate = DateFormat('dd-MM-yyyy').format(dueDate);
+
+String bName="Shree Samarth Trading";
+String bPhone="9284590263";
 
 
   await _requestPermission();
@@ -144,19 +191,49 @@ Future<void> _downloadPDF2( Invoice2? invoice) async {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 // Heading Name and Phone number
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text(
-                      "Shree Samarth Trading",
-                      style: pw.TextStyle(fontSize: 25, font: pw.Font.timesBold()),
-                    ),
-                    pw.Text(
-                      "Mobile: 9284590263",
-                      style: pw.TextStyle(fontSize: 15, font: pw.Font.timesBold()),
-                    ),
-                  ],
+                 pw.Row(
+                    mainAxisAlignment:pw. MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                         pw. Text(
+                            "${bName}",
+                            style: pw.TextStyle(fontSize: 17,  font: pw.Font.timesBold()),
+                          ),
+                          pw.Text(
+                            "Mobile: ${bPhone}",
+                            style: pw.TextStyle(fontSize: 12,  font: pw.Font.timesBold()),
+                          ),
+                        ],
+                      ),
+                     
+
+                        pw.Container(
+                width: 100,
+                height: 100,
+                child: pw.Image(
+                  pw.MemoryImage(imageBytes),
+                  width: 50,
+                  height: 50
                 ),
+              ),
+
+                    ],
+                  ),
+                // pw.Column(
+                //   crossAxisAlignment: pw.CrossAxisAlignment.start,
+                //   children: [
+                //     pw.Text(
+                //       "${bName}",
+                //       style: pw.TextStyle(fontSize: 25, font: pw.Font.timesBold()),
+                //     ),
+                //     pw.Text(
+                //       "Mobile: ${bPhone}",
+                //       style: pw.TextStyle(fontSize: 15, font: pw.Font.timesBold()),
+                //     ),
+                //   ],
+                // ),
                 pw.SizedBox(height: 15),
                 // Invoice Heading Name
                 pw.Container(width: 500, height: 5, color: PdfColors.black),
@@ -197,20 +274,35 @@ Future<void> _downloadPDF2( Invoice2? invoice) async {
                         style: pw.TextStyle(fontSize: 10),
                       ),
                        pw.SizedBox(height: 5),
-                       pw.Row(
-                        children: [
-                              pw.Text(
-                        widget.party.name.toUpperCase(),
-                        style: pw.TextStyle(fontSize: 20, fontBold: pw.Font.timesBold()),
+                      
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Container(
+                              padding: pw.EdgeInsets.symmetric(vertical: 5),
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Text("BILL TO", style: pw.TextStyle(fontSize: 12)),
+                                  pw.Text("${widget.party.name.toUpperCase()}", style: pw.TextStyle(fontSize: 15, fontBold: pw.Font.timesBold())),
+                                ],
+                              ),
+                            ),
+                            pw.Container(
+                              padding: pw.EdgeInsets.symmetric(vertical: 5),
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                                children: [
+                                  pw.Text("Mobile NO.", style: pw.TextStyle(fontSize: 12)),
+                                  pw.Text("${widget.party.contactNumber}", style: pw.TextStyle(fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                        pw.SizedBox(width: 10),
-                        pw.Text("Mobile No.${widget.party.contactNumber.toUpperCase()}"
-                        ,
-                        style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.times()),
-                      ),
-
-                        ]
-                       ),
                       
                     ],
                   ),
@@ -218,55 +310,37 @@ Future<void> _downloadPDF2( Invoice2? invoice) async {
                 pw.SizedBox(height: 10),
                 // Items Heading
                 pw.Container(width: 500, height: 2, color: PdfColors.black),
-                pw.Container(
-                  color: PdfColors.grey100,
-                  padding: pw.EdgeInsets.symmetric(vertical: 7, horizontal: 5),
-                  child: pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(
-                        "ITEMS",
-                        style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
-                      ),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        children: [
-                          pw.Text(
-                            "QTY",
-                            style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
-                          ),
-                          pw.SizedBox(width: 100),
-                          pw.Text(
-                            "RATE",
-                            style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
-                          ),
-                          pw.SizedBox(width: 40),
-                          pw.Text(
-                            "AMOUNT",
-                            style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                itemsName2(),
+               
                 pw.Container(width: 500, height: 2, color: PdfColors.black),
                 // Items
               pw.Container(width: 500, height: 2, color: PdfColors.black),
                 // Items
-                pw.Container(
-                  height: 200,
-                  padding: pw.EdgeInsets.symmetric(vertical: 7, horizontal: 5),
-                  child: pw.Column(
-                    children:[...invoice!.items.map((item) {
-                      final quantity = item.quantity;
-                      final salesPrice = item.unitPrice;
-                       final totalPrice = int.tryParse(item.totalItemValue);
-                      //  totalAmount =invoice.totalAmount;
-                      return items2(item.name, quantity.toString(), salesPrice, totalPrice.toString());
-                    }).toList(),]
-                  ),
-                ),
+                                          pw.Container(
+                                            height: 200,
+                                            padding: pw.EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+                                            child: pw.Column(
+                                              children: [
+                                                if (invoice!.items != null) ...invoice!.items!.map((item) {
+                                                  final quantity = item.quantity;
+                                                  final salesPrice = item.unitPrice;
+                                                  final totalPrice = int.tryParse(item.totalItemValue);
+                                                  final discountType = item.discount_type;
+                                                  final discountValue = item.discount_value;
+                                                  return items2(
+                                                    item.name,
+                                                    quantity.toString(),
+                                                    salesPrice,
+                                                    totalPrice.toString(),
+                                                    item.unit,
+                                                    discountType,
+                                                    discountValue,
+                                                  );
+                                                }).toList(),
+                                              ],
+                                            ),
+                                          ),
+
                 // Subtotal Section
                 pw.Container(width: 500, height: 2, color: PdfColors.black),
                 pw.Container(
@@ -325,42 +399,134 @@ Future<void> _downloadPDF2( Invoice2? invoice) async {
                       ),
 
                       pw.SizedBox(width: 120),
-                      pw.Container(
-                        child: pw.Column(
-                          mainAxisAlignment: pw.MainAxisAlignment.start,
-                          crossAxisAlignment: pw.CrossAxisAlignment.end,
-                          children: [
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                              children: [
-                                pw.Text(
-                                  "TAXABLE AMOUNT ",
-                                  style: pw.TextStyle(font: pw.Font.timesBold(), fontSize: 12),
-                                ),
-                                pw.Text(
-                                  " Rs ${invoice.totalAmount}",
-                                  style: pw.TextStyle(font: pw.Font.timesBold(), fontSize: 15),
-                                ),
-                              ],
-                            ),
-                            pw.Container(width: 170, height: 1, color: PdfColors.grey),
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                              children: [
-                                pw.Text(
-                                  "TOTAL AMOUNT ",
-                                  style: pw.TextStyle(font: pw.Font.timesBold(), fontSize: 12),
-                                ),
-                                pw.Text(
-                                  " Rs ${invoice.totalAmount}",
-                                  style: pw.TextStyle(font: pw.Font.timesBold(), fontSize: 15),
-                                ),
-                              ],
-                            ),
-                            pw.Container(width: 170, height: 1, color: PdfColors.grey),
-                          ],
-                        ),
+                       pw.Container(
+                
+                child: pw.Column(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Row(
+                      mainAxisAlignment:pw. MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text("TAXABLE AMOUNT ",style:pw.TextStyle(font: pw.Font.times(),fontSize: 10,),),
+                        // SizedBox(width: 10,),
+                        pw.Text(" Rs ${totalAmount}" ,style:pw.TextStyle(font: pw.Font.times(),fontSize: 15,),),
+                      ],
+                    ),
+
+                    // New Block Added 
+                          pw.Container(
+                        width: 150,
+                        height: 1,
+                        color:PdfColors.grey,
                       ),
+
+                       pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                         pw. Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text("Received Cash",style:pw.TextStyle(font: pw.Font.times(),fontSize: 10,),),
+                            // SizedBox(width: 10,),
+                            pw.Text(" Rs ${Paymentcash}" ,style:pw.TextStyle(font: pw.Font.times(),fontSize: 15,),),
+                          ],
+                                              ),
+
+                                               pw.  Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                           pw. Text("Received Online",style:pw.TextStyle(font: pw.Font.times(),fontSize: 10,),),
+                            // SizedBox(width: 10,),
+                            pw.Text(" Rs ${PaymentOnline}" ,style:pw.TextStyle(font: pw.Font.times(),fontSize: 15,),),
+                          ],
+                                              ),
+                                // TOtal amount recived 
+
+                                pw.  Container(
+                        width: 150,
+                        height: 1,
+                        color: PdfColors.grey,
+                      ),
+            
+                     pw. Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text("AMOUNT RECEIVED ",style:pw.TextStyle(font: pw.Font.times(),fontSize: 10,),),
+                        // SizedBox(width: 10,),
+                       pw. Text(" Rs ${(int.tryParse(PaymentOnline ?? '0')! + int.tryParse(Paymentcash ?? '0')!)}" ,style:pw.TextStyle(font: pw.Font.times(),fontSize: 15,),),
+                      ],
+                    ),
+                    
+                  pw.  Container(
+                        width: 150,
+                        height: 1,
+                        color: PdfColors.grey,
+                      ),
+                                // TOtal Amount Received 
+
+
+                          pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text("Balance Amount",style:pw.TextStyle(font: pw.Font.times(),fontSize: 10,),),
+                            // SizedBox(width: 10,),
+                          pw.Text(
+                             " Rs ${int.tryParse(invoice.totalAmount??'0')!-(int.tryParse(PaymentOnline ?? '0')! + int.tryParse(Paymentcash ?? '0')!)}",
+                             style: pw.TextStyle(font: pw.Font.times(), fontSize: 15),),
+                          ],
+                                              ),
+                        ],
+                      ),
+            
+                     
+                    
+
+
+                    // New Block Added 
+                    
+                    
+                    
+                      
+                  ],
+                ),
+              ),
+                      // pw.Container(
+                      //   child: pw.Column(
+                      //     mainAxisAlignment: pw.MainAxisAlignment.start,
+                      //     crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      //     children: [
+                      //       pw.Row(
+                      //         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      //         children: [
+                      //           pw.Text(
+                      //             "TAXABLE AMOUNT ",
+                      //             style: pw.TextStyle(font: pw.Font.timesBold(), fontSize: 12),
+                      //           ),
+                      //           pw.Text(
+                      //             " Rs ${invoice.totalAmount}",
+                      //             style: pw.TextStyle(font: pw.Font.timesBold(), fontSize: 15),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //       pw.Container(width: 170, height: 1, color: PdfColors.grey),
+                      //       pw.Row(
+                      //         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      //         children: [
+                      //           pw.Text(
+                      //             "TOTAL AMOUNT ",
+                      //             style: pw.TextStyle(font: pw.Font.timesBold(), fontSize: 12),
+                      //           ),
+                      //           pw.Text(
+                      //             " Rs ${invoice.totalAmount}",
+                      //             style: pw.TextStyle(font: pw.Font.timesBold(), fontSize: 15),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //       pw.Container(width: 170, height: 1, color: PdfColors.grey),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -401,17 +567,30 @@ Future<void> _downloadPDF2( Invoice2? invoice) async {
 }
 }
 
-// Try 3 
-
 
 // Try Fetch
 
- Future<dynamic> fetchInvoice(int invoiceId) async {
+ Future<dynamic> fetchInvoice(int invoceId) async {
       String baseurl = Config.baseURL;
   
-    final response = await http.get(Uri.parse('$baseurl/invoiceid/$invoiceId'));
+    final response = await http.get(Uri.parse('$baseurl/invoiceid/$invoceId'));
+    // print("${response.body.bussinessName}");
+
+
 
     if (response.statusCode == 200) {
+       // If the server returns an OK response, then parse the JSON.
+    final data = jsonDecode(response.body);
+    final businessName = data['bussinessName'];
+    final businessPhone = data['bussinessPhone'];
+    Paymentcash=data['PaymentCash'];
+    PaymentOnline=data['PaymentOnline'];
+
+    // paymentmode=data['PaymentMode'];
+    bName=businessName;
+    bPhone=bPhone;
+    print("Business Name: $businessName");
+    print("Business Phone: $businessPhone");
     return Invoice2.fromJson(json.decode(response.body));
   } else {
     throw Exception('Failed to load invoice');
@@ -450,7 +629,8 @@ Future<void> _downloadPDF2( Invoice2? invoice) async {
     // TODO: implement initState
     super.initState();
     futureInvoice = fetchInvoice(widget.invoice_id);
-  print(futureInvoice);
+
+    print(futureInvoice);
   }
  Invoice2? _currentInvoice;
 
@@ -459,7 +639,9 @@ String status="Unpaid";
 
   @override
   Widget build(BuildContext context) {
-     late String totalAmount;
+    
+   
+     
              // Get the current date and due date
     DateTime now = DateTime.now();
     DateTime dueDate = now.add(Duration(days: 7));
@@ -489,7 +671,118 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
       return false;
     }
   }
+
+  Future<bool> updateInvoice(int invoiceId,int amount,online,cash) async {
+    String baseurl = Config.baseURL;
+    final url = '$baseurl/mark/$invoiceId/mark_as_paid/update/$amount/$online/$cash';
     
+    final response = await http.post(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      // setState(() {
+      //   status="Paid";
+      // });
+      print('Invoice Update');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${widget.party.name} Invoice #${invoiceId} is updated by Rs=${amount}")));
+
+      return true;
+    } else {
+      throw Exception('Failed to mark invoice as paid');
+      return false;
+    }
+  }
+    
+//     String bName="Shree Samarth Trading";
+// String bPhone="9284590263";
+// String bName;
+// String bPhone;
+  TextEditingController amountController = TextEditingController();
+   TextEditingController cashController = TextEditingController();
+    TextEditingController onlineController = TextEditingController();
+
+
+   void _showPaymentBottomSheet(String status, int id, String totalAmount, String cash, String online) {
+    print("$totalAmount, $cash, $online");
+    int balance = int.tryParse(totalAmount ?? '0')! - (int.tryParse(online ?? '0')! + int.tryParse(cash ?? '0')!);
+    print("balance = $balance");
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Enter Amount",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+               TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "Enter total amount",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: cashController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "Enter cash amount",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: onlineController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "Enter online amount",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
+              // TextField(
+              //   controller: amountController,
+              //   keyboardType: TextInputType.number,
+              //   decoration: InputDecoration(
+              //     hintText: "Enter total amount",
+              //     border: OutlineInputBorder(),
+              //   ),
+              // ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  // markInvoice(widget.status == "Unpaid");
+                  print("balance = $balance & amountController.text = ${amountController.text}");
+                  
+                  if (balance == int.tryParse(amountController.text ?? '0')!) {
+                    bool check = await markInvoiceAsPaid(id);
+                    if (check) {
+                      Navigator.of(context).pop(true);
+                    }
+                  } else {
+                    bool check = await updateInvoice(id, int.tryParse(amountController.text ?? '0')!,onlineController.text,cashController.text);
+                    if (check) {
+                      Navigator.of(context).pop(true);
+                    }
+                  }
+                },
+                child: Text(
+                  status == "Unpaid" ? "Mark as Paid" : "Mark as Unpaid",
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('BILL of ${widget.party.name}'),
@@ -532,7 +825,9 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
 
                 Invoice2 invoice = snapshot.data!;
                 _currentInvoice = invoice;
-
+                // paymentCash=invoice.pcash;
+                // paymentOnline=invoice.ponline;
+                totalAmount= invoice.totalAmount;
                 if(invoice.status=="Unpaid"){
                   status="Unpaid";
                 }else{
@@ -558,11 +853,11 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
                                 style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.blue)),
                                 onPressed: ()async{
                                  
-                              bool check=await markInvoiceAsPaid(invoice.id);
-                          
-                              if(check){
-                                Navigator.of(context).pop(true);
-                              }
+                                    // bool check=await markInvoiceAsPaid(invoice.id);
+                          _showPaymentBottomSheet(status,invoice.id,invoice.totalAmount,Paymentcash,PaymentOnline);
+                              // if(check){
+                              //   Navigator.of(context).pop(true);
+                              // }
                                                    
                               }, child: Text((status=="Unpaid")?"Mark as Paid":"Mark as Unpaid",style: TextStyle(color:Colors.white),)),
                             ],
@@ -582,11 +877,17 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
                   children: [
             
                     // Heading Name and Phone number ---------------------------------------
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Shree Samarth Trading",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600,fontFamily:'Times'),),
-                        Text("Mobile: 9284590263",style: TextStyle(fontSize: 12,fontFamily:'Times')),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("$bName",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600,fontFamily:'Times'),),
+                            Text("Mobile: $bPhone",style: TextStyle(fontSize: 12,fontFamily:'Times')),
+                          ],
+                        ),
+                        Image.asset('assest/app_icon.png',width: 50,height: 50,)
                       ],
                     ),
             
@@ -619,17 +920,37 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
             
                     // Party Name ------------- -------------------------------------------------
             
-                    Container(
-                      width: 500,
-                     padding: EdgeInsets.symmetric(vertical: 5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("BILL TO ${widget.party.type}", style: TextStyle( fontSize: 12,),),
-                          Text("${widget.party.name.toUpperCase()}" ,style: TextStyle( fontSize: 15, fontWeight: FontWeight.w600),),
-                        ],
-                      ),
+                    Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          // width: 500,
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("BILL TO", style: TextStyle(fontSize: 12)),
+                              Text("${widget.party.name.toUpperCase()}", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                        ),
+                    
+                         Container(
+                          // width: 500,
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(" ${paymentmode}", style: TextStyle(fontSize: 12)),
+                              Text("${widget.party.contactNumber}", style: TextStyle(fontSize: 12,)),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
             
             SizedBox(height: 10,),
                     // Items Heading ------------- -------------------------------------------------
@@ -638,26 +959,8 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
                       height: 2,
                       color: Colors.black,
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 7,horizontal: 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                        Text("ITEMS",style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                        Text("QTY" ,style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),),
-                        SizedBox(width: 40,),
-                        Text("RATE",style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),),
-                        SizedBox(width: 40,),
-                        Text("AMOUNT",style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),),
-                          ],
-                        ),
-                        
-            
-                      ],),
-                    ),
+                   
+                   itemsName(),
             
             
             
@@ -670,28 +973,32 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
             
             
                     // Items ------------- -------------------------------------------------
-            
-                    Container(
-                      height: 200,
-                      padding: EdgeInsets.symmetric(vertical: 7,horizontal: 5),
-                      child:  Column(
-                        children:[
-                          ...invoice.items.map((item) {
-                      final quantity = item.quantity;
-                      final salesPrice = item.unitPrice;
-                       final totalPrice = int.tryParse(item.totalItemValue);
-                      //  totalAmount =invoice.totalAmount;
-                      return items(item.name, quantity.toString(), salesPrice, totalPrice.toString());
-                      
-                    }).toList(),
-                        ]
-                      
-                      
-                      ) ,
-            
-            
-                    ),
-            
+          
+
+                   Container(
+                          height: 200,
+                          padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+                          child: Column(
+                            children: [
+                              ...invoice.items.map((item) {
+                                final quantity = item.quantity;
+                                final salesPrice = item.unitPrice;
+                                final totalPrice = int.tryParse(item.totalItemValue);
+                                final discountType = item.discount_type;
+                                final discountValue = item.discount_value;
+                                return items(
+                                  item.name,
+                                  quantity.toString(),
+                                  salesPrice,
+                                  totalPrice.toString(),
+                                  item.unit,
+                                  discountType,
+                                  discountValue,
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                        ),
              // Subtotal Section ------------- -------------------------------------------------
                      Container(
                       width: 500,
@@ -769,16 +1076,47 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
                         height: 1,
                         color: Colors.grey,
                       ),
+
+                      Container(
+                        child: Column(children: [
+                          Row(
+                            children: [
+                               Text("Received Cash",style:TextStyle(fontWeight: FontWeight.w400,fontSize: 10,),),
+                            // SizedBox(width: 10,),
+                            Text(" ₹ ${Paymentcash}" ,style:TextStyle(fontWeight: FontWeight.w400,fontSize: 15,),),
+
+                            ],
+                          ),
+
+                          Row(
+                            children: [
+                               Text("Received Online",style:TextStyle(fontWeight: FontWeight.w400,fontSize: 10,),),
+                            // SizedBox(width: 10,),
+                            Text(" ₹ ${PaymentOnline}" ,style:TextStyle(fontWeight: FontWeight.w400,fontSize: 15,),),
+
+                            ],
+                          )
+                        ],),
+                      ),
             
                       Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("TOTAL AMOUNT ",style:TextStyle(fontWeight: FontWeight.w600,fontSize: 12,),),
                         // SizedBox(width: 10,),
-                        Text(" ₹${invoice.totalAmount}" ,style:TextStyle(fontWeight: FontWeight.w600,fontSize: 15,),),
+                        Text(" ₹${(int.tryParse(PaymentOnline ?? '0')! + int.tryParse(Paymentcash ?? '0')!)}" ,style:TextStyle(fontWeight: FontWeight.w600,fontSize: 15,),),
                       ],
                     ),
-                    
+
+                     Row(
+                            children: [
+                               Text("Balance",style:TextStyle(fontWeight: FontWeight.w400,fontSize: 10,),),
+                            // SizedBox(width: 10,),
+                            Text(" ₹ ${int.tryParse(invoice.totalAmount??'0')!-(int.tryParse(PaymentOnline ?? '0')! + int.tryParse(Paymentcash ?? '0')!)}" ,style:TextStyle(fontWeight: FontWeight.w400,fontSize: 15,),),
+
+                            ],
+                          )
+                    ,
                     Container(
                         width: 150,
                         height: 1,
@@ -805,28 +1143,12 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
           ),
                       ],
                 );
-// Try 
 
 
-  // Invoice invoice = snapshot.data!;
-              // return Column(
-              //   crossAxisAlignment: CrossAxisAlignment.start,
-              //   children: [
-              //     Text('Invoice ID: ${invoice.id}'),
-              //     Text('Invoice Date: ${invoice.invoiceDate}'),
-              //     Text('Party ID: ${invoice.partyId}'),
-              //     Text('Status: ${invoice.status}'),
-              //     Text('Total Amount: ${invoice.totalAmount}'),
-              //     Text('Items:'),
-              //     ...invoice.items.map((item) => ListTile(
-              //           title: Text(item.name),
-              //           subtitle: Text('Quantity: ${item.quantity}, Total Item Value: ${item.totalItemValue}, Unit Price: ${item.unitPrice}'),
-              //         )),
-              //   ],
-              // );
+
             } 
 
-// Try 
+
              else {
               return Text('No data');
             }
@@ -836,109 +1158,202 @@ Future<bool> markInvoiceAsPaid(int invoiceId) async {
     
     );
   }
+
+pw.Column items2(String name, String qty, String rate, String amount, String unit, String discountType, String discountValue) {
+  String symbol = (discountType=="Percentage") ? "%" : "Rs"; 
+  return pw.Column(
+    children: [
+      pw.Padding(
+        padding: const pw. EdgeInsets.all(3.0),
+        child:pw. Row(
+          mainAxisAlignment:pw. MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Container(
+              width: 50,
+              child: pw.Text(
+                "$name",
+                style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
+              ),
+            ),
+            pw.Container(
+              width: 50,
+              child: pw.Text(
+                "$qty $unit",
+                style:pw. TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
+                textAlign:pw. TextAlign.right,
+              ),
+            ),
+            pw. Container(
+              width: 50,
+              child: pw.Text(
+                "$symbol $discountValue",
+                style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
+                textAlign: pw.TextAlign.right,
+              ),
+            ),
+           pw. Container(
+              width: 50,
+              child: pw.Text(
+                "Rs $rate",
+                style:pw. TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
+                textAlign: pw.TextAlign.right,
+              ),
+            ),
+           pw. Container(
+              width: 50,
+              child: pw.Text(
+                "Rs $amount",
+                style:pw. TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
+                textAlign:pw. TextAlign.right,
+              ),
+            ),
+          ],
+        ),
+      ),
+      pw.SizedBox(height: 5),
+
+    ],
+  );
+}
+
+
+pw.Column itemsName2() {
+ 
+  return pw.Column(
+    children: [
+      pw.Padding(
+        padding: const pw.EdgeInsets.only(left: 5.0,top:3,bottom: 3),
+        child:pw. Row(
+          mainAxisAlignment:pw. MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Container(
+              width: 70,
+              child: pw.Text("ITEMS", style:pw. TextStyle(fontSize: 12,fontBold: pw.Font.timesBold())),
+            ),
+           pw. Container(
+              width: 50,
+              child: pw.Text("QTY", style:pw. TextStyle(fontSize: 12, fontBold: pw.Font.timesBold())),
+            ),
+             pw.Container(
+              width: 60,
+              child: pw.Text("DISOUNT", style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold())),
+            ),
+            pw.Container(
+              width: 50,
+              child:pw.Text("PRICE", style:pw. TextStyle(fontSize: 12, fontBold: pw.Font.timesBold())),
+            ),
+            pw.Container(
+              width: 50,
+              child: pw.Text("Amount", style:pw. TextStyle(fontSize: 12, fontBold: pw.Font.timesBold())),
+            ),
+          ],
+        ),
+      ),
+     pw. SizedBox(height: 5),
+
+    ],
+  );
+}  
+
+
+
+
 }
 
 
 
 
-  Column items(String name, String qty, String rate, String amount) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(3.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 100,
-                child: Text(
-                  "$name",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                ),
-              ),
-              Container(
-                width: 50,
-                child: Text(
-                  "$qty",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  textAlign: TextAlign.right,
-                ),
-              ),
-              Container(
-                width: 50,
-                child: Text(
-                  "₹ $rate",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  textAlign: TextAlign.right,
-                ),
-              ),
-              Container(
-                width: 50,
-                child: Text(
-                  "₹ $amount",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  textAlign: TextAlign.right,
-                ),
-              ),
-            ],
-          ),
+Column itemsName() {
+ 
+  return Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 5.0,top:3,bottom: 3),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: 70,
+              child: Text("ITEMS", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            ),
+            Container(
+              width: 50,
+              child: Text("QTY", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            ),
+             Container(
+              width: 60,
+              child: Text("DISOUNT", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            ),
+            Container(
+              width: 50,
+              child:Text("PRICE", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            ),
+            Container(
+              width: 50,
+              child: Text("Amount", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            ),
+          ],
         ),
-        Container(
-          width: double.infinity,
-          height: 0.5,
-          color: Colors.grey,
-        ),
-      ],
-    );
-  }
+      ),
+      SizedBox(height: 5),
 
-pw.Column items2(String name, String qty, String rate, String amount) {
-    return pw.Column(
-      children: [
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(3.0),
-          child: pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Container(
-                width: 100,
-                child: pw.Text(
-                  "$name",
-                  style:pw. TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
-                ),
+    ],
+  );
+}  
+
+Column items(String name, String qty, String rate, String amount, String unit, String discountType, String discountValue) {
+  String symbol = (discountType=="Percentage") ? "%" : "₹"; 
+  return Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(3.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: 50,
+              child: Text(
+                "$name",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               ),
-              pw.Container(
-                width: 50,
-                child: pw.Text(
-                  "$qty",
-                  style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
-                  textAlign: pw.TextAlign.right,
-                ),
+            ),
+            Container(
+              width: 50,
+              child: Text(
+                "$qty $unit",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.right,
               ),
-              pw.Container(
-                width: 50,
-                child: pw.Text(
-                  "Rs $rate",
-                  style: pw.TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
-                  textAlign: pw.TextAlign.right,
-                ),
+            ),
+             Container(
+              width: 50,
+              child: Text(
+                "$symbol ${discountValue.isEmpty ? '0' : discountValue}",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.right,
               ),
-              pw.Container(
-                width: 50,
-                child: pw.Text(
-                  "Rs $amount",
-                  style:pw. TextStyle(fontSize: 12, fontBold: pw.Font.timesBold()),
-                  textAlign: pw.TextAlign.right,
-                ),
+            ),
+            Container(
+              width: 50,
+              child: Text(
+                "₹ $rate",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.right,
               ),
-            ],
-          ),
+            ),
+            Container(
+              width: 50,
+              child: Text(
+                "₹ $amount",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ],
         ),
-        pw.Container(
-          width: double.infinity,
-          height: 0.5,
-          color: PdfColors.grey,
-        ),
-      ],
-    );
-  }
+      ),
+      SizedBox(height: 5),
+
+    ],
+  );
+}

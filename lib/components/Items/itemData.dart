@@ -7,14 +7,16 @@ import 'package:http/http.dart' as http;
 
 class ItemsDatas extends StatefulWidget {
   final int id;
-  final String name, quantity, sales_price, purchase_price; // Renamed Purpase_price to purchase_price
+  final String name, quantity, sales_price, purchase_price,unit; // Renamed Purpase_price to purchase_price
   const ItemsDatas({
     Key? key, // Added key parameter
     required this.id,
     required this.name,
     required this.quantity,
     required this.sales_price,
-    required this.purchase_price, // Corrected parameter name
+    required this.purchase_price, 
+    required this.unit,
+    // Corrected parameter name
   }) : super(key: key); // Fixed super constructor invocation
 
   @override
@@ -106,7 +108,9 @@ class _ItemDataState extends State<ItemsDatas> {
               Navigator.of(context).push(MaterialPageRoute(builder: (context)=>UpdateItemData(id:widget.id,
                                                                   name:widget.name,
                                                                   sales_price: widget.sales_price,
-                                                                  purchase_price: widget.purchase_price,))).then((value) {
+                                                                  purchase_price: widget.purchase_price,
+                                                                  unit:widget.unit,
+                                                                  ))).then((value) {
                                                                     if(value){
                                                                       Navigator.of(context).pop(true);
                                                                     }
@@ -253,7 +257,7 @@ class _ItemDataState extends State<ItemsDatas> {
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
                     ),
                     Text(
-                      "${widget.quantity} Bags",
+                      "${widget.quantity} ${widget.unit}",
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     )
                   ],

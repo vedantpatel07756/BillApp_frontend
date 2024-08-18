@@ -50,7 +50,7 @@ class _ItemsState extends State<Items> {
                     scrollDirection: Axis.vertical,
                     child: Column(
                       
-                      children: items.map((item) => itemsLists(item.id,item.name,item.quantity,item.salesPrice,item.purchasePrice)).toList(),
+                      children: items.map((item) => itemsLists(item.id,item.name,item.quantity,item.salesPrice,item.purchasePrice,item.unit)).toList(),
                     ),
                   ),
                 ),
@@ -65,7 +65,7 @@ class _ItemsState extends State<Items> {
     );
   }
 
-  GestureDetector itemsLists(int id, String name,String quantity,String sales_price,String Purpase_price) {
+  GestureDetector itemsLists(int id, String name,String quantity,String sales_price,String Purpase_price,String unit) {
     print(name);
     return  GestureDetector(
       onTap: () {
@@ -73,7 +73,10 @@ class _ItemsState extends State<Items> {
                                                                   name:name,
                                                                   quantity:quantity,
                                                                   sales_price:sales_price,
-                                                                  purchase_price:Purpase_price))).then((value){
+                                                                  purchase_price:Purpase_price,
+                                                                  unit:unit,
+                                                                  
+                                                                  ))).then((value){
                                                                     setState(() {
                                                                       
                                                                     });
@@ -101,7 +104,7 @@ class _ItemsState extends State<Items> {
                             Text(name,style: TextStyle(fontSize: 20),),
                             Row(children: [
                               Text("$quantity",style: TextStyle(fontSize: 20),),
-                              Text("  QTY",style: TextStyle(fontSize: 15,color: Colors.grey),)
+                              Text("  $unit",style: TextStyle(fontSize: 15,color: Colors.grey),)
                             ],)
       
                           ],
